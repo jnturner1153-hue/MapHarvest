@@ -1,5 +1,5 @@
 # ======================================================================
-# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.0)
+# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.1 - FIXED)
 # ======================================================================
 import streamlit as st
 import pandas as pd
@@ -28,7 +28,6 @@ st.title("🎯 MAPHARVEST PRO")
 st.subheader("Data Extraction Engine For Harvesting High-Reputation Local Leads Missing Web Assets")
 
 # 2. Automated Paywall Credentials Terminal
-# Add, remove, or modify your customer keys directly within this dictionary:
 VALID_KEYS = {
     "JAKE_ADMIN_99": "Admin Access", 
     "LEAD_CLIENT_GOLD": "Paid Member",
@@ -72,21 +71,18 @@ if not access_allowed:
     
     st.markdown("### 💎 Request Private Terminal Access")
     st.write("Unlock localized maps, custom market analytics dashboard components, and verified uncompeted leads instantly.")
-    
-    # Switch out this standard URL with your own Stripe Payment Link when you are ready to sell access
     st.markdown('<a href="https://stripe.com" target="_blank"><button style="background-color:#00e676; color:black; padding:14px 36px; border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:bold;">🚀 Provision Search Key Instantly ($49/mo)</button></a>', unsafe_allow_html=True)
 
 else:
     st.markdown("### 🔍 Lead Priority Controls")
     only_missing_websites = st.checkbox("Isolate Zero-Footprint Entries Only (No Website URL Registered)", value=True)
 
-    # Scraper Engine Pipeline (Pulls from public structural directories for zero-installation cloud hosting)
+    # Scraper Engine Pipeline (Fixed URL strings)
     def fetch_local_leads(niche_query, location_query):
         search_url = f"https://yellowpages.com{niche_query}&geo_location_terms={location_query}"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         leads = []
         
-        # Baseline Orlando map center marker reference coordinates to keep mapping nodes localized
         base_lat, base_lon = 28.5383, -81.3792
         
         try:
@@ -111,7 +107,6 @@ else:
                     rating = "4.5"
                     reviews = "16"
                 
-                # Dynamic visual cluster offsets to keep mapping points clean on the web app UI
                 lat_offset = (idx * 0.005) - 0.025
                 lon_offset = (idx * -0.005) + 0.025
                     
@@ -133,7 +128,6 @@ else:
     if 'raw_data' in st.session_state:
         raw_df = st.session_state['raw_data'].copy()
         
-        # Calculate localized analytical parameters before processing dataset display
         total_pulled = len(raw_df)
         missing_web_count = len(raw_df[raw_df["Website URL"] == "None"])
         market_inefficiency = int((missing_web_count / total_pulled) * 100) if total_pulled > 0 else 0
