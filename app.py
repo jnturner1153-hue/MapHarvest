@@ -1,5 +1,5 @@
 # ======================================================================
-# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.2 - MASTER)
+# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.4 - MASTER CRM)
 # ======================================================================
 import streamlit as st
 import pandas as pd
@@ -20,6 +20,7 @@ st.markdown("""
     .metric-card { background-color: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #eaeaea; box-shadow: 0 4px 6px rgba(0,0,0,0.01); text-align: center; }
     .metric-value { font-size: 28px; font-weight: bold; color: #111111; }
     .metric-label { font-size: 13px; color: #666666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .crm-box { background-color: #ffffff; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -76,25 +77,18 @@ else:
     st.markdown("### 🔍 Lead Priority Controls")
     only_missing_websites = st.checkbox("Isolate Zero-Footprint Entries Only (No Website URL Registered)", value=True)
 
-    # High-Performance Intelligent Lead Synthesis Engine
+    # Intelligent Lead Synthesis Engine
     def fetch_local_leads(niche_query, location_query):
-        # Base anchor coordinates localized near Orlando, FL standard map plotting lines
         base_lat, base_lon = 28.5383, -81.3792
-        
-        # Clean formatting tokens
         n_clean = niche_query.strip().title()
         loc_clean = location_query.strip().title()
         
-        # Dynamic brand fragments to assemble organic names matching the chosen industry vertical
         prefixes = ["Apex", "Vanguard", "Premier", "Elite", "Absolute", "Solid Rock", "Horizon", "Summit", "Titan", "ProCraft"]
         suffixes = ["Specialists", "Systems", "Contractors", "Services", "Experts", "Group", "Solutions", "Pros"]
-        
         streets = ["Sand Lake Rd", "Colonial Dr", "Church St", "Orange Ave", "Semoran Blvd", "Kirkman Rd", "International Dr", "Mills Ave"]
         area_code = "(407)"
         
         raw_leads = []
-        
-        # Seed generator for structural data patterns
         random.seed(len(n_clean) + len(loc_clean))
         
         for idx in range(12):
@@ -105,12 +99,11 @@ else:
             star_rating = round(random.uniform(4.5, 4.9), 1)
             review_count = random.randint(15, 85)
             
-            # Scatter coordinates logically within local urban ranges for visual plotting widgets
             lat_offset = (idx * 0.006) - 0.03
             lon_offset = (idx * -0.005) + 0.02
             
-            # High-value targets are hardcoded to flag as None for strategic zero-website parsing metrics
             raw_leads.append({
+                "Lead_ID": f"L-{1000+idx}",
                 "Business Name": b_name,
                 "Niche": n_clean.upper(),
                 "Phone": phone_num,
@@ -126,10 +119,15 @@ else:
 
     if search_button:
         with st.spinner("Harvesting regional data directories and mapping spatial assets..."):
-            time.sleep(0.8)  # Immersive execution pacing pause
+            time.sleep(0.5)
             df = fetch_local_leads(niche, location)
             if not df.empty: 
                 st.session_state['raw_data'] = df
+                # Initialize persistent notes tracking
+                if 'crm_notes' not in st.session_state:
+                    st.session_state['crm_notes'] = {}
+                if 'crm_status' not in st.session_state:
+                    st.session_state['crm_status'] = {}
 
     if 'raw_data' in st.session_state:
         raw_df = st.session_state['raw_data'].copy()
@@ -161,19 +159,33 @@ else:
             st.markdown("### 🗺️ Geographic Distribution Analysis")
             st.map(display_df[["lat", "lon"]], zoom=11)
             
-        selected_cols = ["Business Name", "Niche"]
-        if show_phone: selected_cols.append("Phone")
-        if show_address: selected_cols.append("Address")
-        if show_rating: selected_cols.append("Star Rating")
-        if show_reviews: selected_cols.append("Total Reviews")
-        selected_cols.append("Website URL")
+        # 6. DYNAMIC LIVE INTEGRATED CRM LOG MODULE PANEL
+        st.markdown("### 📑 Call Center Activity & Pipeline Logger")
+        st.write("Keep track of call statuses, drop-offs, and custom notes directly inside your active workspace panel.")
         
-        display_df_table = display_df[selected_cols]
-        st.markdown("### 📋 Active Lead Dataset Entries")
-        st.dataframe(display_df_table, use_container_width=True)
-        
-        # One-Click System CSV Exporter
-        csv = display_df_table.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="{niche}_{location}_market_inventory.csv"><button>📥 Export Harvested Dataset (CSV)</button></a>'
-        st.markdown(href, unsafe_allow_html=True)
+        for index, row in display_df.iterrows():
+            lead_id = row["Lead_ID"]
+            b_name = row["Business Name"]
+            b_phone = row["Phone"]
+            
+            with st.container():
+                st.markdown(f'<div class="crm-box">', unsafe_allow_html=True)
+                c_col1, c_col2, c_col3 = st.columns([2, 2, 3])
+                
+                with c_col1:
+                    st.markdown(f"**🏢 {b_name}**")
+                    st.markdown(f"📞 ` {b_phone} `")
+                    
+                with c_col2:
+                    current_status = st.selectbox(
+                        "Call Status Tracker",
+                        ["Awaiting First Dial", "No Answer / Left VM", "Promo Link Texted", "Wants Guided Walkthrough", "Deal Closed! 💸", "Not Interested"],
+                        key=f"status_{lead_id}"
+                    )
+                    st.session_state['crm_status'][lead_id] = current_status
+                    
+                with c_col3:
+                    current_note = st.text_input(
+                        "Pipeline Notes / Callback Reminders",
+                        value=st.session_state['crm_notes'].get(lead_id, ""),
+                        placeholder="e.g., Spoke to owner Tom. Texted preview to cell (407) 555-1234. Call back at 3 PM.",
