@@ -1,5 +1,5 @@
 # ======================================================================
-# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.4 - MASTER CRM)
+# MAPHARVEST PRO: REGIONAL DATA INTELLIGENCE TERMINAL (V1.4 - CRM FIXED)
 # ======================================================================
 import streamlit as st
 import pandas as pd
@@ -170,7 +170,7 @@ else:
             
             with st.container():
                 st.markdown(f'<div class="crm-box">', unsafe_allow_html=True)
-                c_col1, c_col2, c_col3 = st.columns([2, 2, 3])
+                c_col1, c_col2, c_col3 = st.columns(3)
                 
                 with c_col1:
                     st.markdown(f"**🏢 {b_name}**")
@@ -188,4 +188,8 @@ else:
                     current_note = st.text_input(
                         "Pipeline Notes / Callback Reminders",
                         value=st.session_state['crm_notes'].get(lead_id, ""),
-                        placeholder="e.g., Spoke to owner Tom. Texted preview to cell (407) 555-1234. Call back at 3 PM.",
+                        placeholder="e.g., Spoke to owner Tom.",
+                        key=f"note_{lead_id}"
+                    )
+                    st.session_state['crm_notes'][lead_id] = current_note
+                    
